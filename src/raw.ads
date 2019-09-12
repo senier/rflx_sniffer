@@ -1,26 +1,26 @@
 private with Interfaces.C;
 
 generic
-   type Element_Type is private;
+   type Element_Type is (<>);
    type Index_Type is (<>);
    type Buffer_Type is array (Index_Type range <>) of Element_Type;
-package Raw is
+package Raw
+  with Abstract_State => Network
+is
+   procedure Setup
+   with
+      Global => (Output => Network);
 
-   type Handle is private;
+   function Valid return Boolean
+   with
+      Global => (Input => Network);
 
-   function Setup return Handle;
-   function Valid (H : Handle) return Boolean;
-
-   procedure Receive (H       :     Handle;
-                      Buffer  : out Buffer_Type;
+   procedure Receive (Buffer  : out Buffer_Type;
                       Last    : out Index_Type;
                       Success : out Boolean) with
-      Pre  => Valid (H),
-      Post => Valid (H);
+      Global => (Input => Network),
+      Pre  => Valid and Buffer'Length > 0,
+      Post => Valid
+              and then (if Success then Last <= Buffer'Last);
 
-private
-   type Handle is
-   record
-      FD : Interfaces.C.int;
-   end record;
 end Raw;

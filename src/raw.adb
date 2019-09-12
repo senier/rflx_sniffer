@@ -1,57 +1,67 @@
-with Ada.Text_IO; use Ada.Text_IO;
 with System;
 
-package body Raw is
+package body Raw
+  with Refined_State => (Network => FD)
+is
+   package IC renames Interfaces.C;
+   use type IC.int;
+   use type IC.size_t;
 
-   use Interfaces;
-   use type Interfaces.C.int;
+   FD : IC.int := -1;
 
-   function Setup return Handle
+   procedure Setup
    is
-      function C_Socket (Domain   : C.int;
-                         C_Type   : C.int;
-                         Protocol : C.int) return C.int
+      function C_Socket (Domain   : IC.int;
+                         C_Type   : IC.int;
+                         Protocol : IC.int) return IC.int
       with
+         Global => null,
          Import,
          Convention => C,
          External_Name => "socket";
-      PF_INET     : constant C.int := 2;
-      SOCK_RAW    : constant C.int := 3;
-      IPPROTO_UDP : constant C.int := 17;
+      PF_INET     : constant IC.int := 2;
+      SOCK_RAW    : constant IC.int := 3;
+      IPPROTO_UDP : constant IC.int := 17;
    begin
-      return Handle'(FD => C_Socket (PF_INET, SOCK_RAW, IPPROTO_UDP));
+      FD := C_Socket (PF_INET, SOCK_RAW, IPPROTO_UDP);
    end Setup;
 
-   function Valid (H : Handle) return Boolean is (H.FD /= -1);
+   function Valid return Boolean is (FD /= -1) with Refined_Global => (Input => FD);
 
-   procedure Receive (H       :     Handle;
-                      Buffer  : out Buffer_Type;
+   procedure Receive (Buffer  : out Buffer_Type;
                       Last    : out Index_Type;
                       Success : out Boolean)
    is
-      function C_Recv (FD       : C.int;
-                       Buffer   : C.char_array;
-                       Length   : C.size_t;
-                       Flags    : C.int) return C.int
+      function C_Recv (FD       : IC.int;
+                       Buffer   : Buffer_Type;
+                       Length   : IC.size_t;
+                       Flags    : IC.int) return IC.int
       with
          Import,
          Convention => C,
-         External_Name => "recv";
+         External_Name => "recv",
+         global => null,
+         Pre  => Length <= IC.size_t (Buffer'Length),
+         Post => C_Recv'Result <= IC.int (Buffer'Length);
 
-      procedure C_Perror (Message : String) with Import, External_Name => "perror";
+      procedure C_Perror (Message : String)
+        with
+          Global => null,
+          Import,
+          External_Name => "perror";
 
-      C_Buffer : C.char_array (1 .. Buffer'Length) with Address => Buffer'Address;
-      Result : C.int := C_Recv (H.FD, C_Buffer, C.size_t (Buffer'Length), 0);
+      Result : IC.int;
    begin
-      if Result >= 0 then
+      Buffer := (others => Element_Type'First);
+      Result := C_Recv (FD, Buffer, IC.size_t (Buffer'Length), 0);
+      if Result > 0 then
          Success := True;
-         Last    := Index_Type'Val (Index_Type'Pos (Buffer'First) + C.int'Pos (Result));
+         Last    := Index_Type'Val (Index_Type'Pos (Buffer'First) + IC.int'Pos (Result) - 1);
       else
          Success := False;
+         Last := Buffer'First;
          C_Perror ("Error receiving packet len:" & Buffer'Length'Img & ASCII.NUL);
       end if;
-
-      Put_Line ("Result:" & Result'Img);
    end Receive;
 
 end Raw;
