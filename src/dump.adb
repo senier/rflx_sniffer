@@ -92,7 +92,7 @@ package body Dump is
       use Ada.Text_IO;
       use IPv4.Packet;
    begin
-      Put ("Version:" & Get_Version (Context)'Img);
+      Put ("IP: Version:" & Get_Version (Context)'Img);
       Put (" IHL:" & Get_IHL (Context)'Img);
       Put (" DSCP:" & Get_DSCP (Context)'Img);
       Put (" ECN:" & Get_ECN (Context)'Img);
@@ -106,7 +106,20 @@ package body Dump is
       Put (" HCSum:" & Get_Header_Checksum (Context)'Img);
       Put (" Src:" & Dump_Address (Get_Source (Context)));
       Put (" Dst:" & Dump_Address (Get_Destination (Context)));
-      New_Line;
    end IP;
+
+   procedure UDPD (Context : UDP.Datagram.Context_Type)
+   is
+      use Ada.Text_IO;
+      use UDP.Datagram;
+   begin
+      Put (", UDP:");
+      Put (" SPort:" & Get_Source_Port (Context)'Img);
+      Put (" DPort:" & Get_Destination_Port (Context)'Img);
+      Put (" Len:" & Get_Length (Context)'Img);
+      Put (" CSum:" & Get_Checksum (Context)'Img);
+      Put (" ");
+   end UDPD;
+
 
 end Dump;
