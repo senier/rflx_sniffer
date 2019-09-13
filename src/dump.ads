@@ -1,6 +1,9 @@
 with IPv4.Packet;
+with Types;
 
 package Dump is
+
+   procedure Hex (Buffer : Types.Bytes);
 
    procedure IP (Context : IPv4.Packet.Context_Type)
    with

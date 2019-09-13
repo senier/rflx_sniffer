@@ -15,7 +15,7 @@ package body Dump is
       if D < 10 then
          return Character'Val (Types.Byte'Pos (D) + Character'Pos ('0'));
       else
-         return Character'Val (Types.Byte'Pos (D) + Character'Pos ('a'));
+         return Character'Val (Types.Byte'Pos (D) + Character'Pos ('a') - 10);
       end if;
    end Digit;
 
@@ -32,6 +32,7 @@ package body Dump is
          end if;
          Put (Digit (Buffer (E) / 16) & Digit (Buffer (E) mod 16));
       end loop;
+      New_Line;
    end Hex;
 
    function Dump_Protocol (Proto : IPv4.Protocol_Type) return String
@@ -90,7 +91,6 @@ package body Dump is
    is
       use Ada.Text_IO;
       use IPv4.Packet;
-      procedure Dump_Payload is new Get_Payload (Process_Payload => Hex);
    begin
       Put ("Version:" & Get_Version (Context)'Img);
       Put (" IHL:" & Get_IHL (Context)'Img);
@@ -107,10 +107,6 @@ package body Dump is
       Put (" Src:" & Dump_Address (Get_Source (Context)));
       Put (" Dst:" & Dump_Address (Get_Destination (Context)));
       New_Line;
-      if Present (Context, F_Payload) then
-         Dump_Payload (Context);
-      end if;
-      New_Line (2);
    end IP;
 
 end Dump;
