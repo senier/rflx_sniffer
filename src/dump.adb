@@ -3,15 +3,19 @@ with Types;
 
 package body Dump is
 
+   use type Types.Byte;
+
+   function Digit (D : Types.Byte) return Character
+   with Pre => D <= 255 - Character'Pos ('a');
 
    function Digit (D : Types.Byte) return Character
    is
       use type Types.Byte;
    begin
       if D < 10 then
-         return Character'Val (Types.Byte'Pos (D) + 48);
+         return Character'Val (Types.Byte'Pos (D) + Character'Pos ('0'));
       else
-         return Character'Val (Types.Byte'Pos (D) + 87);
+         return Character'Val (Types.Byte'Pos (D) + Character'Pos ('a'));
       end if;
    end Digit;
 
@@ -28,15 +32,34 @@ package body Dump is
          end if;
          Put (Digit (Buffer (E) / 16) & Digit (Buffer (E) mod 16));
       end loop;
-   end Hex;   
-   
-   function Dump_Protocol (Proto : IPv4.Protocol_Type) return String is
-     (if Proto.Known then " " & Proto.Enum'Img (10 .. Proto.Enum'Img'Last) else Proto.Raw'Img);
-     
+   end Hex;
+
+   function Dump_Protocol (Proto : IPv4.Protocol_Type) return String
+   with
+       Post => Dump_Protocol'Result'Length <= 5;
+
+   function Dump_Protocol (Proto : IPv4.Protocol_Type) return String
+   is
+   begin
+      if Proto.Known
+      then
+         case Proto.Enum is
+            when IPv4.PROTOCOL_UDP => return " UDP";
+         end case;
+      else
+         return Proto.Raw'Img;
+      end if;
+
+   end Dump_Protocol;
+
    use type IPv4.Flag_Type;
    function Dump_Flag (F : IPv4.Flag_Type) return String is
      (if F = IPv4.Flag_True then " 1" else " 0");
-      
+
+   function Dump_Address (Addr : IPv4.Address_Type) return String
+   with
+      Post => Dump_Address'Result'Length <= 16;
+
    function Dump_Address (Addr : IPv4.Address_Type) return String
    is
       use type IPv4.Address_Type;
@@ -44,11 +67,25 @@ package body Dump is
       O2 : constant IPv4.Address_Type := Addr / 256**1 mod 256;
       O3 : constant IPv4.Address_Type := Addr / 256**2 mod 256;
       O4 : constant IPv4.Address_Type := Addr / 256**3 mod 256;
-      function I (O : IPv4.Address_Type) return String is (O'Img (O'Img'First + 1 .. O'Img'Last));
+
+      function I (Octet : IPv4.Address_Type) return String
+        with
+          Pre => Octet < 256,
+          Post => I'Result'Length <= 3;
+
+      function I (Octet : IPv4.Address_Type) return String
+      is
+         O : constant String := Octet'Img;
+         L : constant Natural := (if O'Length <= 4 then O'Length else 4);
+      begin
+         return O (O'First + 1 .. O'First + L - 1);
+      end I;
+
+
    begin
       return " " & I (O4) & "." & I (O3) & "." & I (O2) & "." & I (O1);
    end Dump_Address;
-   
+
    procedure IP (Context : IPv4.Packet.Context_Type)
    is
       use Ada.Text_IO;
@@ -70,7 +107,9 @@ package body Dump is
       Put (" Src:" & Dump_Address (Get_Source (Context)));
       Put (" Dst:" & Dump_Address (Get_Destination (Context)));
       New_Line;
-      Dump_Payload (Context);
+      if Present (Context, F_Payload) then
+         Dump_Payload (Context);
+      end if;
       New_Line (2);
    end IP;
 

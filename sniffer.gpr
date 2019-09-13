@@ -9,4 +9,14 @@ project Sniffer is
       for Global_Configuration_Pragmas use "spark.adc";
    end Builder;
 
+   package Prove is
+      for Proof_Switches ("Ada") use (
+         "-j0",
+         "--prover=z3,cvc4",
+         "--steps=5000",
+         "--checks-as-errors",
+         "--warnings=error",
+         "--no-axiom-guard"  --  WORKAROUND: Componolit/Workarounds#5
+      );
+   end Prove;
 end Sniffer;
