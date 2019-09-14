@@ -1,9 +1,9 @@
-project Sniffer is
+project UDP_Sniffer is
 
    for Create_Missing_Dirs use "true";
    for Source_Dirs use ("src", "generated");
    for Object_Dir use "obj";
-   for Main use ("sn_ip.adb", "sn_udp_in_ip.adb");
+   for Main use ("sniff_udp_in_ip.adb");
 
    package Builder is
       for Global_Configuration_Pragmas use "spark.adc";
@@ -19,4 +19,4 @@ project Sniffer is
          "--no-axiom-guard"  --  WORKAROUND: Componolit/Workarounds#5
       );
    end Prove;
-end Sniffer;
+end UDP_Sniffer;

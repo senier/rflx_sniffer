@@ -6,7 +6,7 @@ with Sniffer.IPv4.Packet;
 with Sniffer.In_IPv4.Contains;
 with Sniffer.UDP.Datagram;
 
-procedure Sn_UDP_in_IP
+procedure Sniff_UDP_in_IP
 is
    use Sniffer;
    use type Types.Bytes_Ptr;
@@ -96,4 +96,4 @@ begin
          pragma Assert (Buffer'Last = 1500);
       end if;
    end loop;
-end Sn_UDP_in_IP;
+end Sniff_UDP_in_IP;

@@ -6,7 +6,7 @@ with Sniffer.IPv4.Packet;
 with Sniffer.In_IPv4.Contains;
 with Sniffer.UDP.Datagram;
 
-procedure Sn_IP
+procedure Sniff_IP
 is
    use Sniffer;
    package Network is new Raw (Element_Type => Types.Byte,
@@ -31,14 +31,11 @@ begin
    end if;
 
    loop
-      pragma Loop_Invariant (Buffer /= null);
-      pragma Loop_Invariant (Buffer'Last = 1500);
-
+      pragma Loop_Invariant (Buffer /= null and then Buffer'Last = 1500);
       Network.Receive (Buffer.all, Last, Success);
       if Success then
          IPv4.Packet.Initialize (Context, Buffer);
          IPv4.Packet.Verify_Message (Context);
-
          if IPv4.Packet.Structural_Valid_Message (Context) then
             Dump.IP (Context);
             if IPv4.Packet.Present (Context, IPv4.Packet.F_Payload) then
@@ -46,8 +43,7 @@ begin
             end if;
             New_Line;
          end if;
-
          IPv4.Packet.Take_Buffer (Context, Buffer);
       end if;
    end loop;
-end Sn_IP;
+end Sniff_IP;
