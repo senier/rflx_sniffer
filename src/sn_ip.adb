@@ -21,7 +21,7 @@ is
    Unused_Bit_Index : Types.Bit_Length_Type;
    use type Types.Bytes_Ptr;
    use type Types.Length_Type;
-   procedure Dump_Payload is new IPv4.Packet.Get_Payload (Process_Payload => Dump.Hex);
+   procedure Dump_Payload is new IPv4.Packet.Get_Payload (Process_Payload => Dump.Payload);
 begin
    Network.Setup;
    if not Network.Valid

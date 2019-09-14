@@ -1,4 +1,4 @@
-with Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 with Types;
 
 package body Dump is
@@ -23,8 +23,8 @@ package body Dump is
    is
       use type Types.Byte;
       use type Types.Length_Type;
-      use Ada.Text_IO;
    begin
+      Put (" ");
       for E in Buffer'Range
       loop
          if E /= Buffer'First then
@@ -34,6 +34,13 @@ package body Dump is
       end loop;
       New_Line;
    end Hex;
+
+   procedure Payload (Buffer : Types.Bytes)
+   is
+   begin
+      Put (" Payload:");
+      Hex (Buffer);
+   end Payload;
 
    function Dump_Protocol (Proto : IPv4.Protocol_Type) return String
    with
@@ -118,7 +125,6 @@ package body Dump is
       Put (" DPort:" & Get_Destination_Port (Context)'Img);
       Put (" Len:" & Get_Length (Context)'Img);
       Put (" CSum:" & Get_Checksum (Context)'Img);
-      Put (" ");
    end UDPD;
 
 

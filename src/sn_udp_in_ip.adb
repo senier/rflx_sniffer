@@ -54,8 +54,8 @@ is
    C : constant Packet := (others => 0);
    Buffer : Types.Bytes_Ptr := new Packet'(C);
 
-   procedure Dump_Payload is new IPv4.Packet.Get_Payload (Process_Payload => Dump.Hex);
-   procedure Dump_Payload is new UDP.Datagram.Get_Payload (Process_Payload => Dump.Hex);
+   procedure Dump_Payload is new IPv4.Packet.Get_Payload (Process_Payload => Dump.Payload);
+   procedure Dump_Payload is new UDP.Datagram.Get_Payload (Process_Payload => Dump.Payload);
 
 begin
    Network.Setup;
