@@ -4,7 +4,7 @@ generic
    type Element_Type is (<>);
    type Index_Type is (<>);
    type Buffer_Type is array (Index_Type range <>) of Element_Type;
-package Raw
+package Sniffer.Raw
   with Abstract_State => Network
 is
    procedure Setup
@@ -23,4 +23,4 @@ is
       Post => Valid
               and then (if Success then Last <= Buffer'Last);
 
-end Raw;
+end Sniffer.Raw;

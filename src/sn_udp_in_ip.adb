@@ -1,13 +1,14 @@
 with Ada.Text_IO; use Ada.Text_IO;
-with Types;
-with Raw;
-with Dump;
-with IPv4.Packet;
-with In_IPv4.Contains;
-with UDP.Datagram;
+with Sniffer.Types;
+with Sniffer.Raw;
+with Sniffer.Dump;
+with Sniffer.IPv4.Packet;
+with Sniffer.In_IPv4.Contains;
+with Sniffer.UDP.Datagram;
 
 procedure Sn_UDP_in_IP
 is
+   use Sniffer;
    use type Types.Bytes_Ptr;
    use type Types.Length_Type;
 
@@ -39,12 +40,11 @@ is
                           UDP_Context : in out UDP.Datagram.Context_Type;
                           Buffer      :    out Types.Bytes_Ptr)
    is
-      Unused_Bit_Index : Types.Bit_Index_Type;
    begin
       if IPv4.Packet.Has_Buffer (IP_Context) then
-         IPv4.Packet.Take_Buffer (IP_Context, Buffer, Unused_Bit_Index);
+         IPv4.Packet.Take_Buffer (IP_Context, Buffer);
       elsif UDP.Datagram.Has_Buffer (UDP_Context) then
-         UDP.Datagram.Take_Buffer (UDP_Context, Buffer, Unused_Bit_Index);
+         UDP.Datagram.Take_Buffer (UDP_Context, Buffer);
       else
          pragma Assert (False);
       end if;
@@ -53,9 +53,6 @@ is
    subtype Packet is Types.Bytes (1 .. 1500);
    C : constant Packet := (others => 0);
    Buffer : Types.Bytes_Ptr := new Packet'(C);
-
-   procedure Dump_Payload is new IPv4.Packet.Get_Payload (Process_Payload => Dump.Payload);
-   procedure Dump_Payload is new UDP.Datagram.Get_Payload (Process_Payload => Dump.Payload);
 
 begin
    Network.Setup;
@@ -85,12 +82,12 @@ begin
                   Dump.UDPD (UDP_Context);
                   if UDP.Datagram.Present (UDP_Context, UDP.Datagram.F_Payload)
                   then
-                     Dump_Payload (UDP_Context);
+                     Dump.Payload (UDP_Context);
                   end if;
                end if;
             elsif IPv4.Packet.Present (IP_Context, IPv4.Packet.F_Payload)
             then
-               Dump_Payload (IP_Context);
+               Dump.Payload (IP_Context);
             end if;
             New_Line;
          end if;

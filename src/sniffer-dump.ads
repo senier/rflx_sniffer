@@ -1,11 +1,16 @@
-with IPv4.Packet;
-with UDP.Datagram;
-with Types;
+with Sniffer.IPv4.Packet;
+with Sniffer.UDP.Datagram;
+with Sniffer.Types;
 
-package Dump is
+package Sniffer.Dump is
+
+   use Sniffer;
 
    procedure Hex (Buffer : Types.Bytes);
-   procedure Payload (Buffer : Types.Bytes);
+
+   procedure Payload_Internal (Buffer : Types.Bytes);
+   procedure Payload is new IPv4.Packet.Get_Payload (Process_Payload => Payload_Internal);
+   procedure Payload is new UDP.Datagram.Get_Payload (Process_Payload => Payload_Internal);
 
    procedure IP (Context : IPv4.Packet.Context_Type)
    with
@@ -17,4 +22,4 @@ package Dump is
       Pre => UDP.Datagram.Has_Buffer (Context)
              and then UDP.Datagram.Structural_Valid_Message (Context);
 
-end Dump;
+end Sniffer.Dump;

@@ -1,6 +1,6 @@
 with System;
 
-package body Raw
+package body Sniffer.Raw
   with Refined_State => (Network => FD)
 is
    package IC renames Interfaces.C;
@@ -64,4 +64,4 @@ is
       end if;
    end Receive;
 
-end Raw;
+end Sniffer.Raw;

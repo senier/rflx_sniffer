@@ -1,7 +1,7 @@
 with Ada.Text_IO; use Ada.Text_IO;
-with Types;
+with Sniffer.Types;
 
-package body Dump is
+package body Sniffer.Dump is
 
    use type Types.Byte;
 
@@ -35,12 +35,12 @@ package body Dump is
       New_Line;
    end Hex;
 
-   procedure Payload (Buffer : Types.Bytes)
+   procedure Payload_Internal (Buffer : Types.Bytes)
    is
    begin
       Put (" Payload:");
       Hex (Buffer);
-   end Payload;
+   end Payload_Internal;
 
    function Dump_Protocol (Proto : IPv4.Protocol_Type) return String
    with
@@ -128,4 +128,4 @@ package body Dump is
    end UDPD;
 
 
-end Dump;
+end Sniffer.Dump;

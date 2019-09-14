@@ -1,13 +1,14 @@
 with Ada.Text_IO; use Ada.Text_IO;
-with Types;
-with Raw;
-with Dump;
-with IPv4.Packet;
-with In_IPv4.Contains;
-with UDP.Datagram;
+with Sniffer.Types;
+with Sniffer.Raw;
+with Sniffer.Dump;
+with Sniffer.IPv4.Packet;
+with Sniffer.In_IPv4.Contains;
+with Sniffer.UDP.Datagram;
 
 procedure Sn_IP
 is
+   use Sniffer;
    package Network is new Raw (Element_Type => Types.Byte,
                                Index_Type   => Types.Index_Type,
                                Buffer_Type  => Types.Bytes);
@@ -18,10 +19,9 @@ is
    subtype Packet is Types.Bytes (1 .. 1500);
    C : constant Packet := (others => 0);
    Buffer : Types.Bytes_Ptr := new Packet'(C);
-   Unused_Bit_Index : Types.Bit_Length_Type;
+
    use type Types.Bytes_Ptr;
    use type Types.Length_Type;
-   procedure Dump_Payload is new IPv4.Packet.Get_Payload (Process_Payload => Dump.Payload);
 begin
    Network.Setup;
    if not Network.Valid
@@ -42,12 +42,12 @@ begin
          if IPv4.Packet.Structural_Valid_Message (Context) then
             Dump.IP (Context);
             if IPv4.Packet.Present (Context, IPv4.Packet.F_Payload) then
-               Dump_Payload (Context);
+               Dump.Payload (Context);
             end if;
             New_Line;
          end if;
 
-         IPv4.Packet.Take_Buffer (Context, Buffer, Unused_Bit_Index);
+         IPv4.Packet.Take_Buffer (Context, Buffer);
       end if;
    end loop;
 end Sn_IP;
