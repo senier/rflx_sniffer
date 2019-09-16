@@ -15,8 +15,7 @@ is
    Success : Boolean;
 
    subtype Packet is Types.Bytes (1 .. 1500);
-   C : constant Packet := (others => 0);
-   Buffer : Types.Bytes_Ptr := new Packet'(C);
+   Buffer : Types.Bytes_Ptr := new Packet'(Packet'Range => 0);
 
    use type Types.Bytes_Ptr;
    use type Types.Length_Type;
