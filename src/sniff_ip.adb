@@ -1,4 +1,3 @@
-with Ada.Text_IO; use Ada.Text_IO;
 with Sniffer.Types;
 with Sniffer.Raw;
 with Sniffer.Dump;
@@ -14,7 +13,6 @@ is
                                Buffer_Type  => Types.Bytes);
    Last    : Types.Index_Type;
    Success : Boolean;
-   Context : IPv4.Packet.Context_Type := IPv4.Packet.Create;
 
    subtype Packet is Types.Bytes (1 .. 1500);
    C : constant Packet := (others => 0);
@@ -22,16 +20,17 @@ is
 
    use type Types.Bytes_Ptr;
    use type Types.Length_Type;
+
+   Context : IPv4.Packet.Context_Type := IPv4.Packet.Create;
 begin
    Network.Setup;
    if not Network.Valid
    then
-      Put_Line ("Error obtaining raw socket");
       return;
    end if;
 
    loop
-      pragma Loop_Invariant (Buffer /= null and then Buffer'Last = 1500);
+      pragma Loop_Invariant (Buffer /= null and then Buffer'Last = Packet'Last);
       Network.Receive (Buffer.all, Last, Success);
       if Success then
          IPv4.Packet.Initialize (Context, Buffer);
@@ -41,7 +40,6 @@ begin
             if IPv4.Packet.Present (Context, IPv4.Packet.F_Payload) then
                Dump.Payload (Context);
             end if;
-            New_Line;
          end if;
          IPv4.Packet.Take_Buffer (Context, Buffer);
       end if;

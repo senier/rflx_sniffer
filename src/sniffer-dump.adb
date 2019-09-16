@@ -99,6 +99,7 @@ package body Sniffer.Dump is
       use Ada.Text_IO;
       use IPv4.Packet;
    begin
+      New_Line;
       Put ("IP: Version:" & Get_Version (Context)'Img);
       Put (" IHL:" & Get_IHL (Context)'Img);
       Put (" DSCP:" & Get_DSCP (Context)'Img);
