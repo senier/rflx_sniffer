@@ -22,7 +22,7 @@ package body Sniffer.Dump is
    procedure Hex (Buffer : Types.Bytes)
    is
       use type Types.Byte;
-      use type Types.Length_Type;
+      use type Types.Length;
    begin
       Put (" ");
       for E in Buffer'Range
@@ -42,11 +42,11 @@ package body Sniffer.Dump is
       Hex (Buffer);
    end Payload_Internal;
 
-   function Dump_Protocol (Proto : IPv4.Protocol_Type) return String
+   function Dump_Protocol (Proto : IPv4.Protocol) return String
    with
        Post => Dump_Protocol'Result'Length <= 5;
 
-   function Dump_Protocol (Proto : IPv4.Protocol_Type) return String
+   function Dump_Protocol (Proto : IPv4.Protocol) return String
    is
    begin
       if Proto.Known
@@ -60,28 +60,28 @@ package body Sniffer.Dump is
 
    end Dump_Protocol;
 
-   use type IPv4.Flag_Type;
-   function Dump_Flag (F : IPv4.Flag_Type) return String is
+   use type IPv4.Flag;
+   function Dump_Flag (F : IPv4.Flag) return String is
      (if F = IPv4.Flag_True then " 1" else " 0");
 
-   function Dump_Address (Addr : IPv4.Address_Type) return String
+   function Dump_Address (Addr : IPv4.Address) return String
    with
       Post => Dump_Address'Result'Length <= 16;
 
-   function Dump_Address (Addr : IPv4.Address_Type) return String
+   function Dump_Address (Addr : IPv4.Address) return String
    is
-      use type IPv4.Address_Type;
-      O1 : constant IPv4.Address_Type := Addr / 256**0 mod 256;
-      O2 : constant IPv4.Address_Type := Addr / 256**1 mod 256;
-      O3 : constant IPv4.Address_Type := Addr / 256**2 mod 256;
-      O4 : constant IPv4.Address_Type := Addr / 256**3 mod 256;
+      use type IPv4.Address;
+      O1 : constant IPv4.Address := Addr / 256**0 mod 256;
+      O2 : constant IPv4.Address := Addr / 256**1 mod 256;
+      O3 : constant IPv4.Address := Addr / 256**2 mod 256;
+      O4 : constant IPv4.Address := Addr / 256**3 mod 256;
 
-      function I (Octet : IPv4.Address_Type) return String
+      function I (Octet : IPv4.Address) return String
         with
           Pre => Octet < 256,
           Post => I'Result'Length <= 3;
 
-      function I (Octet : IPv4.Address_Type) return String
+      function I (Octet : IPv4.Address) return String
       is
          O : constant String := Octet'Img;
          L : constant Natural := (if O'Length <= 4 then O'Length else 4);
@@ -94,38 +94,38 @@ package body Sniffer.Dump is
       return " " & I (O4) & "." & I (O3) & "." & I (O2) & "." & I (O1);
    end Dump_Address;
 
-   procedure IP (Context : IPv4.Packet.Context_Type)
+   procedure IP (Ctx : IPv4.Packet.Context)
    is
       use Ada.Text_IO;
       use IPv4.Packet;
    begin
       New_Line;
-      Put ("IP: Version:" & Get_Version (Context)'Img);
-      Put (" IHL:" & Get_IHL (Context)'Img);
-      Put (" DSCP:" & Get_DSCP (Context)'Img);
-      Put (" ECN:" & Get_ECN (Context)'Img);
-      Put (" TLen:" & Get_Total_Length (Context)'Img);
-      Put (" Id:" & Get_Identification (Context)'Img);
-      Put (" DF:" & Dump_Flag (Get_Flag_DF (Context)));
-      Put (" MF:" & Dump_Flag (Get_Flag_MF (Context)));
-      Put (" FOff:" & Get_Fragment_Offset (Context)'Img);
-      Put (" TTL:" & Get_TTL (Context)'Img);
-      Put (" Proto:" & Dump_Protocol (Get_Protocol (Context)));
-      Put (" HCSum:" & Get_Header_Checksum (Context)'Img);
-      Put (" Src:" & Dump_Address (Get_Source (Context)));
-      Put (" Dst:" & Dump_Address (Get_Destination (Context)));
+      Put ("IP: Version:" & Get_Version (Ctx)'Img);
+      Put (" IHL:" & Get_IHL (Ctx)'Img);
+      Put (" DSCP:" & Get_DSCP (Ctx)'Img);
+      Put (" ECN:" & Get_ECN (Ctx)'Img);
+      Put (" TLen:" & Get_Total_Length (Ctx)'Img);
+      Put (" Id:" & Get_Identification (Ctx)'Img);
+      Put (" DF:" & Dump_Flag (Get_Flag_DF (Ctx)));
+      Put (" MF:" & Dump_Flag (Get_Flag_MF (Ctx)));
+      Put (" FOff:" & Get_Fragment_Offset (Ctx)'Img);
+      Put (" TTL:" & Get_TTL (Ctx)'Img);
+      Put (" Proto:" & Dump_Protocol (Get_Protocol (Ctx)));
+      Put (" HCSum:" & Get_Header_Checksum (Ctx)'Img);
+      Put (" Src:" & Dump_Address (Get_Source (Ctx)));
+      Put (" Dst:" & Dump_Address (Get_Destination (Ctx)));
    end IP;
 
-   procedure UDPD (Context : UDP.Datagram.Context_Type)
+   procedure UDPD (Ctx : UDP.Datagram.Context)
    is
       use Ada.Text_IO;
       use UDP.Datagram;
    begin
       Put (", UDP:");
-      Put (" SPort:" & Get_Source_Port (Context)'Img);
-      Put (" DPort:" & Get_Destination_Port (Context)'Img);
-      Put (" Len:" & Get_Length (Context)'Img);
-      Put (" CSum:" & Get_Checksum (Context)'Img);
+      Put (" SPort:" & Get_Source_Port (Ctx)'Img);
+      Put (" DPort:" & Get_Destination_Port (Ctx)'Img);
+      Put (" Len:" & Get_Length (Ctx)'Img);
+      Put (" CSum:" & Get_Checksum (Ctx)'Img);
    end UDPD;
 
 

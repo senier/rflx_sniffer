@@ -10,20 +10,20 @@ procedure Sniff_UDP_in_IP
 is
    use Sniffer;
    use type Types.Bytes_Ptr;
-   use type Types.Length_Type;
+   use type Types.Length;
 
    package Network is new Raw (Element_Type => Types.Byte,
-                               Index_Type   => Types.Index_Type,
+                               Index_Type   => Types.Index,
                                Buffer_Type  => Types.Bytes);
-   Last    : Types.Index_Type;
+   Last    : Types.Index;
    Success : Boolean;
-   IP_Context  : IPv4.Packet.Context_Type := IPv4.Packet.Create;
-   UDP_Context : UDP.Datagram.Context_Type := UDP.Datagram.Create;
+   IP_Context  : IPv4.Packet.Context := IPv4.Packet.Create;
+   UDP_Context : UDP.Datagram.Context := UDP.Datagram.Create;
 
    pragma Unevaluated_Use_Of_Old (Allow);
 
-   procedure Take_Buffer (IP_Context  : in out IPv4.Packet.Context_Type;
-                          UDP_Context : in out UDP.Datagram.Context_Type;
+   procedure Take_Buffer (IP_Context  : in out IPv4.Packet.Context;
+                          UDP_Context : in out UDP.Datagram.Context;
                           Buffer      :    out Types.Bytes_Ptr)
    with
       Pre  => IPv4.Packet.Has_Buffer (IP_Context)
@@ -36,8 +36,8 @@ is
                         else False);
 
 
-   procedure Take_Buffer (IP_Context  : in out IPv4.Packet.Context_Type;
-                          UDP_Context : in out UDP.Datagram.Context_Type;
+   procedure Take_Buffer (IP_Context  : in out IPv4.Packet.Context;
+                          UDP_Context : in out UDP.Datagram.Context;
                           Buffer      :    out Types.Bytes_Ptr)
    is
    begin

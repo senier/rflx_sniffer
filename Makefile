@@ -1,8 +1,10 @@
 all: obj/sniff_ip obj/sniff_ip_in_udp
 
+gen: generated/sniffer-ipv4.ads generated/sniffer-udp.ads
+
 generated/sniffer-ipv4.ads generated/sniffer-udp.ads: specs/ipv4.rflx specs/udp.rflx specs/in_ipv4.rflx
-	@mkdir -p generated
-	rflx generate -p sniffer $^ generated/
+	mkdir -p generated
+	rflx generate -p Sniffer $^ generated/
 
 obj/sniff_ip: generated/sniffer-ipv4.ads
 	gprbuild -P ip_sniffer.gpr
